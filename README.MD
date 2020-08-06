@@ -1,5 +1,13 @@
 # php使用rsa加解密方法
 
+### 更新日志 (最新更新时间2020.08.06)
+1. 增加最新方法，去除加密字符串长度限制，原方法有128位长度限制
+```
+新增方法
+$result = $class->encryptionNew(); //加密
+$result = $class->decryptNew(); //解密
+```
+
 ```
 私钥解密方法类
 use Rsa\RsaPrivateDecrypt 
