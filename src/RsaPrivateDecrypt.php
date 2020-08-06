@@ -22,10 +22,17 @@ class RsaPrivateDecrypt
      */
     public $content = '';
 
-    public function __construct($content, $privateKey)
+    /**
+     * 是否需要进行将解密之后的内容转化为数组
+     * @var bool
+     */
+    public $json = false;
+
+    public function __construct($content, $privateKey, $json = false)
     {
         $this->setPrivateKey($privateKey);
         $this->setContent($content);
+        $this->setJson($json);
     }
 
     /**
@@ -45,6 +52,14 @@ class RsaPrivateDecrypt
     }
 
     /**
+     * @return bool
+     */
+    public function getJson()
+    {
+        return $this->json;
+    }
+
+    /**
      * @param string $PrivateKey
      */
     public function setPrivateKey($PrivateKey)
@@ -61,6 +76,14 @@ class RsaPrivateDecrypt
     }
 
     /**
+     * @param bool $json
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+    }
+
+    /**
      * 解密方法
      * @return false|string
      */
@@ -68,6 +91,7 @@ class RsaPrivateDecrypt
     {
         $privateKey = $this->getPrivateKey();
         $privateContent = $this->getContent();
+        $json = $this->getJson();
         $key = openssl_pkey_get_private($privateKey);
         if (!$key) {
             return false;
@@ -86,6 +110,10 @@ class RsaPrivateDecrypt
             $pos += $len;
         }
         openssl_free_key($key);
+        if ($json) {
+            parse_str($content, $params);
+            return $params;
+        }
         return $content;
     }
 }

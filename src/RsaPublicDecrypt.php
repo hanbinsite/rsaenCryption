@@ -23,10 +23,17 @@ class RsaPublicDecrypt
      */
     public $content = '';
 
-    public function __construct($content, $publicKey)
+    /**
+     * 是否需要进行将解密之后的内容转化为数组
+     * @var bool
+     */
+    public $json = false;
+
+    public function __construct($content, $publicKey, $json = false)
     {
         $this->setPublicKey($publicKey);
         $this->setContent($content);
+        $this->setJson($json);
     }
 
     /**
@@ -46,6 +53,14 @@ class RsaPublicDecrypt
     }
 
     /**
+     * @return bool
+     */
+    public function getJson()
+    {
+        return $this->json;
+    }
+
+    /**
      * @param string $publicKey
      */
     public function setPublicKey($publicKey)
@@ -62,6 +77,14 @@ class RsaPublicDecrypt
     }
 
     /**
+     * @param bool $json
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+    }
+
+    /**
      * 解密方法
      * @return false|mixed
      */
@@ -69,23 +92,29 @@ class RsaPublicDecrypt
     {
         $publicKey = $this->getPublicKey();
         $publicContent = $this->getContent();
+        $json = $this->getJson();
         $key = openssl_pkey_get_public($publicKey);
         if (!$key) {
             return false;
         }
+        $data = pack('H*', $publicContent);
         $content = '';
-        $len = 117;
+        $len = 128;
         $pos = 0;
-        while ($pos < strlen($publicContent)) {
-            $return_res = openssl_public_encrypt(substr($publicContent, $pos, $len), $crypted, $key);
+        while ($pos < strlen($data)) {
+            $return_res = openssl_public_decrypt(substr($data, $pos, $len), $decrypted, $key);
             if (!$return_res) {
                 openssl_free_key($key);
                 return false;
             }
-            $content .= $crypted;
+            $content .= $decrypted;
             $pos += $len;
         }
         openssl_free_key($key);
-        return unpack('H*', $content)[1];
+        if ($json) {
+            parse_str($content, $params);
+            return $params;
+        }
+        return $content;
     }
 }

@@ -66,22 +66,21 @@ class RsaPublicEncryption
         $publicContent = $this->getContent();
         $key = openssl_pkey_get_public($publicKey);
         if (!$key) {
-            return -1;
+            return false;
         }
-        $data = pack('H*', $publicContent);
         $content = '';
-        $len = 128;
+        $len = 117;
         $pos = 0;
-        while ($pos < strlen($data)) {
-            $return_res = openssl_public_decrypt(substr($data, $pos, $len), $decrypted, $key);
+        while ($pos < strlen($publicContent)) {
+            $return_res = openssl_public_encrypt(substr($publicContent, $pos, $len), $crypted, $key);
             if (!$return_res) {
                 openssl_free_key($key);
-                return 0;
+                return false;
             }
-            $content .= $decrypted;
+            $content .= $crypted;
             $pos += $len;
         }
         openssl_free_key($key);
-        return $content;
+        return unpack('H*', $content)[1];
     }
 }
