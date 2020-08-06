@@ -60,6 +60,10 @@ class RsaPublicEncryption
         $this->content = $content;
     }
 
+    /**
+     * 加密方法，  此方法有长度限制，128
+     * @return false|mixed
+     */
     public function encryption()
     {
         $publicKey = $this->getPublicKey();
@@ -82,5 +86,26 @@ class RsaPublicEncryption
         }
         openssl_free_key($key);
         return unpack('H*', $content)[1];
+    }
+
+    /**
+     * 最新加密方法
+     * @return false
+     */
+    public function encryptionNew()
+    {
+        $publicKey = $this->getPublicKey();
+        $publicContent = $this->getContent();
+        $key = openssl_pkey_get_public($publicKey);
+        if (!$key) {
+            return false;
+        }
+
+        $result = openssl_public_encrypt($publicContent, $content, $key);
+        openssl_free_key($key);
+        if ($result) {
+            return $content;
+        }
+        return false;
     }
 }

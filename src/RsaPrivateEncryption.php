@@ -60,7 +60,7 @@ class RsaPrivateEncryption
     }
 
     /**
-     * 加密方法
+     * 加密方法， 有长度限制，限制为  128
      * @return false|string
      */
     public function encryption()
@@ -91,5 +91,28 @@ class RsaPrivateEncryption
         }
         openssl_free_key($key);
         return unpack('H*', $content)[1];
+    }
+
+    /**
+     * 通用最新加密方法
+     * @return false
+     */
+    public function encryptionNew()
+    {
+        $encryptionKey = $this->getPrivateKey();
+        $encryptionData = $this->getContent();
+        $key = openssl_pkey_get_private($encryptionKey);
+        if (!$key) {
+            /**
+             * 私钥不合法或者私钥初始化失败
+             */
+            return false;
+        }
+        $result = openssl_private_encrypt($encryptionData, $content, $key);
+        openssl_free_key($key);
+        if ($result) {
+            return $content;
+        }
+        return false;
     }
 }

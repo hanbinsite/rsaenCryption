@@ -84,7 +84,7 @@ class RsaPrivateDecrypt
     }
 
     /**
-     * 解密方法
+     * 解密方法,长度限制128
      * @return false|string
      */
     public function decrypt()
@@ -115,5 +115,32 @@ class RsaPrivateDecrypt
             return $params;
         }
         return $content;
+    }
+
+    /**
+     * 通用解密方法，
+     * @return false
+     */
+    public function decryptNew()
+    {
+        $privateKey = $this->getPrivateKey();
+        $privateContent = $this->getContent();
+        $json = $this->getJson();
+        $key = openssl_pkey_get_private($privateKey);
+        if (!$key) {
+            return false;
+        }
+
+        $result = openssl_private_decrypt($privateContent, $content, $key);
+        openssl_free_key($key);
+        if ($result) {
+            if ($json) {
+                parse_str($content, $params);
+                return $params;
+            }
+            return $content;
+        }
+
+        return false;
     }
 }

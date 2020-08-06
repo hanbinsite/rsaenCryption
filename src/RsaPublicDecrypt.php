@@ -86,6 +86,7 @@ class RsaPublicDecrypt
 
     /**
      * 解密方法
+     * 此方法长度限制为128
      * @return false|mixed
      */
     public function decrypt()
@@ -116,5 +117,32 @@ class RsaPublicDecrypt
             return $params;
         }
         return $content;
+    }
+
+    /**
+     * 使用通用方法进行加密
+     * @return false
+     */
+    public function decryptNew()
+    {
+        $publicKey = $this->getPublicKey();
+        $publicContent = $this->getContent();
+        $json = $this->getJson();
+        $key = openssl_pkey_get_public($publicKey);
+        if (!$key) {
+            return false;
+        }
+
+        $result = openssl_public_decrypt($publicContent, $content, $key);
+        openssl_free_key($key);
+        if ($result) {
+            if ($json) {
+                parse_str($content, $params);
+                return $params;
+            }
+            return $content;
+        }
+
+        return false;
     }
 }
