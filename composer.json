@@ -1,0 +1,21 @@
+{
+    "name": "hanbin/rsa_encryption",
+    "description": "rsa",
+    "type": "library",
+    "authors": [
+        {
+            "name": "hanbin",
+            "email": "1837261009@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "ext-openssl": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rsa\\": "src/"
+        }
+    }
+}
